@@ -123,10 +123,27 @@ interactive_info() {
   cmd_info "$url"
 }
 
+print_logo() {
+  local blue reset
+  blue='' reset=''
+  if [[ -t 1 ]]; then
+    blue=$'\033[38;5;33m'
+    reset=$'\033[0m'
+  fi
+
+  print -r -- "${blue} _     _ _ _       _                         ${reset}"
+  print -r -- "${blue}| |__ (_) | | ___ | | _____      ___ __      ${reset}"
+  print -r -- "${blue}| '_ \| | | |/ _ \| |/ / _ \ \ / / '__|     ${reset}"
+  print -r -- "${blue}| |_) | | | | (_) |   <  __/\ V /| |        ${reset}"
+  print -r -- "${blue}|_.__/|_|_|_|\___/|_|\_\___| \_/ |_|        ${reset}"
+}
+
 interactive_menu() {
   local choice
 
   while true; do
+    print
+    print_logo
     print
     print -r -- "Bilidown CLI"
     print -r -- "────────────────────────"
