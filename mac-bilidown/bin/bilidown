@@ -54,11 +54,11 @@ terminal_text_width() {
 
 box_line() {
   local text="$1" color="$2" reset="$3"
-  local box_width=62 content_width padding
+  local box_width=58 content_width padding
   content_width="$(terminal_text_width "$text")"
   padding=$(( box_width - content_width ))
   (( padding < 1 )) && padding=1
-  printf '%s│%s  %s%*s%s│%s\n' "$color" "$reset" "$text" "$padding" '' "$color" "$reset" >&2
+  printf '%s┃%s  %s%*s%s┃%s\n' "$color" "$reset" "$text" "$padding" '' "$color" "$reset" >&2
 }
 
 prompt_value() {
@@ -68,15 +68,15 @@ prompt_value() {
   local value line border color reset title_width title_rule_width
   color='' reset=''
   if [[ -t 2 ]]; then
-    color=$'\033[38;5;33m'
+    color=$'\033[1;38;5;33m'
     reset=$'\033[0m'
   fi
 
-  border="$(printf '─%.0s' {1..62})"
+  border="$(printf '━%.0s' {1..60})"
   title_width="$(terminal_text_width "$title")"
-  title_rule_width=$(( 61 - title_width ))
+  title_rule_width=$(( 57 - title_width ))
   (( title_rule_width < 1 )) && title_rule_width=1
-  print -r -- "${color}╭─ ${title} ${border[1,$title_rule_width]}╮${reset}" >&2
+  print -r -- "${color}┏━ ${title} ${border[1,$title_rule_width]}┓${reset}" >&2
   for line in "$@"; do
     box_line "$line" "$color" "$reset"
   done
@@ -84,13 +84,13 @@ prompt_value() {
     box_line "" "$color" "$reset"
   fi
   box_line "$prompt" "$color" "$reset"
-  print -n -- "${color}│${reset}  › " >&2
+  print -n -- "${color}┃  ❯ ${reset}" >&2
   if ! read -r value; then
     print >&2
-    print -r -- "${color}╰${border}──╯${reset}" >&2
+    print -r -- "${color}┗${border}┛${reset}" >&2
     return 1
   fi
-  print -r -- "${color}╰${border}──╯${reset}" >&2
+  print -r -- "${color}┗${border}┛${reset}" >&2
   print -r -- "$value"
 }
 
