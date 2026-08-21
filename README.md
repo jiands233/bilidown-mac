@@ -1,203 +1,212 @@
 # Bilidown Mac
 
+![macOS 13+](https://img.shields.io/badge/macOS-13%2B-111827?logo=apple&logoColor=white)
+![Swift 5.9](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)
+![Apple Silicon + Intel](https://img.shields.io/badge/Mac-Apple%20Silicon%20%2B%20Intel-0A84FF)
+
+一个专为 macOS 制作的本地 B 站视频下载工具。既可以在终端输入 `bilidown` 使用交互式 CLI，也可以运行原生 SwiftUI App 或本地 Web 页面。
+
 ![Bilidown Mac 封面](Assets/Cover.png)
 
-这是一个 macOS 版 B 站视频下载工具。可以直接打开图形 App 输入链接下载，也可以用命令行工作流调用。
+## 为什么是 Bilidown
 
-当前版本已经内置专属 App 图标，并在图形界面中加入了轻量的 macOS 玻璃材质效果。图标包含默认、深色、透明三种外观，App 内可以选择“自动 / 默认 / 深色 / 透明”。
+- **一条命令启动**：安装后在任意目录输入 `bilidown`
+- **交互式终端体验**：带 Logo、菜单和 Claude/Codex 风格输入框
+- **自动清洗链接**：粘贴带 `spm_id_from`、`vd_source` 的长链接即可
+- **常用画质齐全**：最佳、1080p、720p、仅音频
+- **登录画质支持**：按需读取本机 Chrome Cookie
+- **三种使用方式**：CLI、原生 macOS App、本地 Web
+- **依赖随项目提供**：内置 Apple Silicon 与 Intel 版 `yt-dlp`、`ffmpeg`
 
-## 图形 App
+## 快速开始：交互式 CLI
 
-运行：
-
-```bash
-./script/build_and_run.sh
-```
-
-App 功能：
-
-- 输入 B 站视频链接
-- 选择保存文件夹
-- 选择清晰度：最佳、1080p、720p、仅音频
-- 点击“下载视频”后输出到所选目录
-- 默认不读取 Chrome Cookie；需要登录后高清资源时，勾选“使用 Chrome Cookie”
-
-构建脚本会生成并启动：
-
-```text
-dist/BilidownMac.app
-```
-
-Codex 里也配置了 Run action，可以直接点 Run 启动。
-
-## 独立双平台 App
-
-新整合版 App 独立于上面的 `BilidownMac.app`，不会替换旧 App：
+### 1. 下载项目
 
 ```bash
-./script/build_and_run_videodown.sh
+git clone https://github.com/jiands233/bilidown-mac.git
+cd bilidown-mac
 ```
 
-构建脚本会生成并启动：
-
-```text
-dist/VideoDownMac.app
-```
-
-功能：
-
-- 自动识别 B 站和 YouTube 链接
-- 选择清晰度：最佳、1080p、720p、仅音频
-- 可选使用 Chrome Cookie
-- 可选下载全部播放列表 / 合集
-- B 站下载调用 `mac-bilidown/bin/bilidown`
-- YouTube 下载调用 `youtube-down/bin/youtubedown`
-
-Codex 里新增了 `Run Integrated` action，用于启动这个双平台 App；原来的 `Run` 仍然启动 `BilidownMac.app`。
-
-## VideoSpeechAgent
-
-`VideoSpeechAgent` 是独立的演讲学习包工作流：保留下载器能力，同时把 YouTube 演讲整理成中英学习文稿包。
-
-运行 App：
-
-```bash
-./script/build_and_run_videospeech_agent.sh
-```
-
-CLI 入口：
-
-```bash
-bin/videospeech --help
-bin/videospeech run --url "https://www.youtube.com/watch?v=..." --download-media --quality 720p
-bin/videospeech build --project "$HOME/Documents/VideoSpeechAgent/data/VIDEO_ID"
-bin/videospeech verify --project "$HOME/Documents/VideoSpeechAgent/data/VIDEO_ID"
-```
-
-第一次在其他设备使用 CLI 时：
-
-```bash
-./script/bootstrap_videospeech_env.sh
-```
-
-安装 Codex Skill：
-
-```bash
-./script/install_videospeech_skill.sh
-```
-
-Skill 名称是 `video-speech-agent`。它负责读取 `agent_task.md` 和 `segments.en.json`，补齐 `segments.zh.json` 与 `study_notes.json`，再调用 CLI 生成并验证 Word 文稿包。
-
-## Web 版
-
-运行：
-
-```bash
-./script/run_web.sh
-```
-
-打开：
-
-```text
-http://127.0.0.1:4789
-```
-
-Web 版功能：
-
-- 输入 B 站视频链接
-- 选择清晰度
-- 勾选是否使用 Chrome Cookie
-- 勾选是否下载全部分 P / 合集
-- 点击“选择文件夹”打开 macOS 原生文件夹选择窗口
-- 点击“下载视频”后由本机后端调用 `mac-bilidown/bin/bilidown`
-
-说明：这个 Web 只绑定在 `127.0.0.1`，也就是只给本机访问。它不会把 Cookie 或链接上传到外部服务器。
-
-### 打包 Web 版
-
-生成一个可以直接发给别人的文件夹：
-
-```bash
-./script/package_web.sh
-```
-
-打包结果：
-
-```text
-dist/BilidownWeb
-```
-
-把整个 `dist/BilidownWeb` 文件夹发给别人。对方在 Mac 上双击：
-
-```text
-启动 Bilidown Web.command
-```
-
-即可打开本地 Web 页面。这个文件夹内置 Node.js、`yt-dlp` 和 `ffmpeg`，支持 Apple Silicon 和 Intel Mac。
-
-App 图标资源位于：
-
-```text
-Assets/AppIcon.icns
-Assets/AppIcon.png
-Assets/AppIconDark.icns
-Assets/AppIconDark.png
-Assets/AppIconTransparent.icns
-Assets/AppIconTransparent.png
-```
-
-预览：
-
-![Bilidown Mac 图标变体](Assets/AppIconVariants.png)
-
-需要重新生成图标资源时运行：
-
-```bash
-./script/generate_app_icons.py
-```
-
-## 命令行
-
-首次安装全局命令：
+### 2. 安装 `bilidown` 命令
 
 ```bash
 ./script/install_bilidown.sh
 source ~/.zshrc
 ```
 
-之后在任意目录输入即可打开交互式 CLI：
+### 3. 开始使用
 
 ```bash
 bilidown
 ```
 
-菜单中可以选择快速下载、查看视频信息或环境检查。也可以继续使用参数模式：
+启动后可以直接选择：
 
-交互模式会自动清洗粘贴的 B 站长链接，去掉 `?spm_id...`、`vd_source...` 等追踪参数，只保留视频地址本身。
-
-```bash
-./mac-bilidown/bin/bilidown doctor
-./mac-bilidown/bin/bilidown download "https://www.bilibili.com/video/BV..."
+```text
+1  快速下载
+2  查看视频信息
+3  环境检查
+4  退出
 ```
 
-默认输出目录：
+快速下载会依次询问 B 站链接、清晰度和 Chrome Cookie。默认保存到：
 
 ```text
 ~/Downloads/Bilidown
 ```
 
-完整说明见：
+> 安装命令会在 `~/bin` 创建指向当前项目的符号链接，并在需要时把 `~/bin` 加入 `~/.zshrc`。安装后请保留项目目录；如果移动项目，请重新运行安装脚本。
 
-- [中文使用说明](./mac-bilidown/使用说明.md)
-- [English README](./mac-bilidown/README.md)
+## 命令模式
 
-核心 CLI 实现位于 [`mac-bilidown`](./mac-bilidown)：
+交互模式之外，也可以直接传入参数，适合脚本、Raycast 和快捷指令。
 
-- `bin/bilidown`：命令行入口
-- `vendor/darwin-arm64`：Apple Silicon 依赖
-- `vendor/darwin-x64`：Intel Mac 依赖
-- `scripts/fetch-vendor-deps.zsh`：依赖修复/重拉脚本
+```bash
+# 检查运行环境
+bilidown doctor
 
-## 说明
+# 查看视频信息
+bilidown info "https://www.bilibili.com/video/BV..."
 
-下载能力基于 `yt-dlp` 的 Bilibili extractor 和内置 macOS `ffmpeg`。
+# 下载最佳画质
+bilidown download "https://www.bilibili.com/video/BV..."
+
+# 下载 720p，不读取 Cookie
+bilidown download "https://www.bilibili.com/video/BV..." \
+  --quality 720p \
+  --no-cookies
+
+# 下载整个多 P / 合集
+bilidown download "https://www.bilibili.com/video/BV..." \
+  --playlist all
+```
+
+### 常用参数
+
+| 参数 | 可选值 | 默认值 |
+| --- | --- | --- |
+| `--quality` | `best`、`1080p`、`720p`、`audio` | `best` |
+| `--output` | 任意本地目录 | `~/Downloads/Bilidown` |
+| `--playlist` | `current`、`all` | `current` |
+| `--no-cookies` | 不读取浏览器 Cookie | 默认读取 Chrome Cookie |
+| `--cookies-from-browser` | 浏览器名称 | `chrome` |
+
+完整命令说明：
+
+```bash
+bilidown help
+```
+
+## 原生 macOS App
+
+需要 macOS 13 或更高版本，以及可用的 Swift 5.9 工具链。
+
+```bash
+./script/build_and_run.sh
+```
+
+构建完成后会生成并打开：
+
+```text
+dist/BilidownMac.app
+```
+
+App 支持链接输入、保存目录选择、画质选择、Chrome Cookie 开关，以及自动、默认、深色、透明四种图标外观策略。
+
+## 本地 Web 版
+
+```bash
+./script/run_web.sh
+```
+
+浏览器打开：
+
+```text
+http://127.0.0.1:4789
+```
+
+Web 服务仅绑定 `127.0.0.1`，链接和 Cookie 不会提交到项目自己的远程服务器。
+
+需要制作可分发文件夹时运行：
+
+```bash
+./script/package_web.sh
+```
+
+输出目录为 `dist/BilidownWeb`。对方可以在 Mac 上双击其中的 `启动 Bilidown Web.command`。
+
+## Cookie 与隐私
+
+- CLI 默认通过 `yt-dlp --cookies-from-browser chrome` 读取本机 Chrome Cookie
+- Cookie 只由本机下载进程使用，不会写入仓库或上传到 Bilidown 服务
+- 首次读取时，macOS 可能询问是否允许访问 Chrome Safe Storage
+- 只下载公开视频时，可以在交互菜单选择“不使用”，或添加 `--no-cookies`
+
+如果 Keychain 授权等待超时，可以先运行：
+
+```bash
+bilidown download "https://www.bilibili.com/video/BV..." --no-cookies
+```
+
+## 常见问题
+
+### `zsh: command not found: bilidown`
+
+回到项目目录重新安装并刷新终端环境：
+
+```bash
+./script/install_bilidown.sh
+source ~/.zshrc
+```
+
+### B 站返回 HTTP 412
+
+先使用不带追踪参数的标准视频链接，并更新项目内置依赖：
+
+```bash
+./mac-bilidown/scripts/fetch-vendor-deps.zsh
+```
+
+然后重新运行 `bilidown`。交互模式会自动清洗问号后的追踪参数。
+
+### 想确认环境是否正常
+
+```bash
+bilidown doctor
+```
+
+### 依赖缺失或不可执行
+
+```bash
+./mac-bilidown/scripts/fetch-vendor-deps.zsh
+```
+
+需要同时准备 Apple Silicon 和 Intel 依赖：
+
+```bash
+./mac-bilidown/scripts/fetch-vendor-deps.zsh --all-arch
+```
+
+## 项目结构
+
+```text
+BilidownMac/
+├── Sources/BilidownMac/       # SwiftUI macOS App
+├── mac-bilidown/              # 核心 CLI 与内置依赖
+│   ├── bin/bilidown
+│   ├── scripts/
+│   └── vendor/
+├── web-bilidown/              # 本地 Web 界面与 Node.js 服务
+├── script/                    # 构建、安装和打包脚本
+└── Assets/                    # 封面与 App 图标
+```
+
+更多文档：
+
+- [中文 CLI 使用说明](mac-bilidown/使用说明.md)
+- [English CLI README](mac-bilidown/README.md)
+- [第三方依赖许可](mac-bilidown/THIRD_PARTY_LICENSES.md)
+
+## 使用说明
+
+下载能力基于 `yt-dlp` 的 Bilibili extractor 和内置 `ffmpeg`。请仅下载你有权访问和保存的内容，并遵守 B 站服务条款及当地法律。
