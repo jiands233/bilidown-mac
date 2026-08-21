@@ -37,6 +37,175 @@ Exit codes:
 EOF
 }
 
+terminal_text_width() {
+  local text="$1" char
+  local width=0 index
+
+  for (( index = 1; index <= ${#text}; index++ )); do
+    char="${text[index]}"
+    if [[ "$char" == [[:ascii:]] || "$char" == "›" ]]; then
+      (( width += 1 ))
+    else
+      (( width += 2 ))
+    fi
+  done
+  print -r -- "$width"
+}
+
+box_line() {
+  local text="$1" color="$2" reset="$3"
+  local box_width=58 content_width padding
+  content_width="$(terminal_text_width "$text")"
+  padding=$(( box_width - content_width ))
+  (( padding < 1 )) && padding=1
+  printf '%s┃%s  %s%*s%s┃%s\n' "$color" "$reset" "$text" "$padding" '' "$color" "$reset" >&2
+}
+
+prompt_value() {
+  local title="$1" prompt="$2"
+  shift 2
+
+  local value line border color reset title_width title_rule_width
+  color='' reset=''
+  if [[ -t 2 ]]; then
+    color=$'\033[1;38;5;33m'
+    reset=$'\033[0m'
+  fi
+
+  border="$(printf '━%.0s' {1..60})"
+  title_width="$(terminal_text_width "$title")"
+  title_rule_width=$(( 57 - title_width ))
+  (( title_rule_width < 1 )) && title_rule_width=1
+  print -r -- "${color}┏━ ${title} ${border[1,$title_rule_width]}┓${reset}" >&2
+  for line in "$@"; do
+    box_line "$line" "$color" "$reset"
+  done
+  if (( $# > 0 )); then
+    box_line "" "$color" "$reset"
+  fi
+  box_line "$prompt" "$color" "$reset"
+  print -n -- "${color}┃  ❯ ${reset}" >&2
+  if ! read -r value; then
+    print >&2
+    print -r -- "${color}┗${border}┛${reset}" >&2
+    return 1
+  fi
+  print -r -- "${color}┗${border}┛${reset}" >&2
+  print -r -- "$value"
+}
+
+interactive_url() {
+  local value cleaned
+  value="$(prompt_value 'Bilidown' '粘贴 B 站视频链接（输入 q 退出）')" || return 1
+  case "$value:l" in
+    q|quit|exit) return 1 ;;
+  esac
+  if [[ -z "$value" ]]; then
+    log "链接不能为空。"
+    return 2
+  fi
+
+  cleaned="${value%%\?*}"
+  cleaned="${cleaned%%\#*}"
+  cleaned="${cleaned%/}"
+  if [[ "$cleaned" != "$value" ]]; then
+    print -r -- "已自动清洗链接：$cleaned" >&2
+  fi
+  print -r -- "$cleaned"
+}
+
+interactive_download() {
+  local url quality_choice quality cookie_choice cookie_flag
+
+  url="$(interactive_url)" || return 0
+  if ! is_bilibili_url "$url"; then
+    log "这不是有效的 B 站链接，请重新开始。"
+    return 0
+  fi
+
+  print
+  quality_choice="$(prompt_value '选择清晰度' '请选择 [1-4，默认 1]' \
+    '1  最佳画质' \
+    '2  1080p' \
+    '3  720p' \
+    '4  仅音频')" || return 0
+  case "$quality_choice" in
+    ''|1) quality="best" ;;
+    2) quality="1080p" ;;
+    3) quality="720p" ;;
+    4) quality="audio" ;;
+    *) log "无效选择，请重新开始。"; return 0 ;;
+  esac
+
+  print
+  cookie_choice="$(prompt_value 'Chrome Cookie' '请选择 [1-2，默认 1]' \
+    '登录后可获取更高清晰度' \
+    '1  使用（默认）' \
+    '2  不使用')" || return 0
+  case "$cookie_choice" in
+    ''|1) cookie_flag="" ;;
+    2) cookie_flag="--no-cookies" ;;
+    *) log "无效选择，请重新开始。"; return 0 ;;
+  esac
+
+  print
+  print -r -- "开始下载，清晰度：$quality"
+  if [[ -n "$cookie_flag" ]]; then
+    cmd_download "$url" --quality "$quality" "$cookie_flag"
+  else
+    cmd_download "$url" --quality "$quality"
+  fi
+}
+
+interactive_info() {
+  local url
+  url="$(interactive_url)" || return 0
+  if ! is_bilibili_url "$url"; then
+    log "这不是有效的 B 站链接，请重新开始。"
+    return 0
+  fi
+  cmd_info "$url"
+}
+
+print_logo() {
+  local style reset
+  style='' reset=''
+  if [[ -t 1 ]]; then
+    style=$'\033[1;38;5;33m'
+    reset=$'\033[0m'
+  fi
+
+  print -r -- "${style}          ██████╗   ██╗  ██╗     ██╗  ██████╗    ██████╗  ██╗    ██╗  ███╗   ██╗${reset}"
+  print -r -- "${style}        ██╔══██╗  ██║  ██║     ██║  ██╔══██╗  ██╔═══██╗ ██║    ██║  ████╗  ██║${reset}"
+  print -r -- "${style}      ██████╔╝  ██║  ██║     ██║  ██║  ██║  ██║   ██║ ██║ █╗ ██║  ██╔██╗ ██║${reset}"
+  print -r -- "${style}    ██╔══██╗   ██║  ██║     ██║  ██║  ██║  ██║   ██║ ██║███╗██║  ██║╚██╗██║${reset}"
+  print -r -- "${style}  ██████╔╝    ██║  ███████╗██║  ██████╔╝  ╚██████╔╝ ╚███╔███╔╝  ██║ ╚████║${reset}"
+  print -r -- "${style}╚═════╝     ╚═╝  ╚══════╝╚═╝  ╚═════╝    ╚═════╝   ╚══╝╚══╝   ╚═╝  ╚═══╝${reset}"
+}
+
+interactive_menu() {
+  local choice
+
+  while true; do
+    print
+    print_logo
+    print
+    choice="$(prompt_value 'Bilidown CLI' '请选择 [1-4]' \
+      '1  快速下载' \
+      '2  查看视频信息' \
+      '3  环境检查' \
+      '4  退出')" || return "$EXIT_OK"
+
+    case "$choice:l" in
+      1) interactive_download ;;
+      2) interactive_info ;;
+      3) cmd_doctor --skip-cookie-check ;;
+      4|q|quit|exit) return "$EXIT_OK" ;;
+      *) log "无效选择，请输入 1、2、3 或 4。" ;;
+    esac
+  done
+}
+
 log() {
   print -r -- "$*" >&2
 }
@@ -514,8 +683,8 @@ cmd_doctor() {
 
 main() {
   if (( $# == 0 )); then
-    print_usage
-    exit "$EXIT_USAGE"
+    interactive_menu
+    exit $?
   fi
 
   local command="$1"
