@@ -30,6 +30,64 @@ dist/BilidownMac.app
 
 Codex 里也配置了 Run action，可以直接点 Run 启动。
 
+## 独立双平台 App
+
+新整合版 App 独立于上面的 `BilidownMac.app`，不会替换旧 App：
+
+```bash
+./script/build_and_run_videodown.sh
+```
+
+构建脚本会生成并启动：
+
+```text
+dist/VideoDownMac.app
+```
+
+功能：
+
+- 自动识别 B 站和 YouTube 链接
+- 选择清晰度：最佳、1080p、720p、仅音频
+- 可选使用 Chrome Cookie
+- 可选下载全部播放列表 / 合集
+- B 站下载调用 `mac-bilidown/bin/bilidown`
+- YouTube 下载调用 `youtube-down/bin/youtubedown`
+
+Codex 里新增了 `Run Integrated` action，用于启动这个双平台 App；原来的 `Run` 仍然启动 `BilidownMac.app`。
+
+## VideoSpeechAgent
+
+`VideoSpeechAgent` 是独立的演讲学习包工作流：保留下载器能力，同时把 YouTube 演讲整理成中英学习文稿包。
+
+运行 App：
+
+```bash
+./script/build_and_run_videospeech_agent.sh
+```
+
+CLI 入口：
+
+```bash
+bin/videospeech --help
+bin/videospeech run --url "https://www.youtube.com/watch?v=..." --download-media --quality 720p
+bin/videospeech build --project "$HOME/Documents/VideoSpeechAgent/data/VIDEO_ID"
+bin/videospeech verify --project "$HOME/Documents/VideoSpeechAgent/data/VIDEO_ID"
+```
+
+第一次在其他设备使用 CLI 时：
+
+```bash
+./script/bootstrap_videospeech_env.sh
+```
+
+安装 Codex Skill：
+
+```bash
+./script/install_videospeech_skill.sh
+```
+
+Skill 名称是 `video-speech-agent`。它负责读取 `agent_task.md` 和 `segments.en.json`，补齐 `segments.zh.json` 与 `study_notes.json`，再调用 CLI 生成并验证 Word 文稿包。
+
 ## Web 版
 
 运行：
@@ -99,6 +157,21 @@ Assets/AppIconTransparent.png
 ```
 
 ## 命令行
+
+首次安装全局命令：
+
+```bash
+./script/install_bilidown.sh
+source ~/.zshrc
+```
+
+之后在任意目录输入即可打开交互式 CLI：
+
+```bash
+bilidown
+```
+
+菜单中可以选择快速下载、查看视频信息或环境检查。也可以继续使用参数模式：
 
 ```bash
 ./mac-bilidown/bin/bilidown doctor
