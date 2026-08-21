@@ -50,7 +50,7 @@ prompt_value() {
 }
 
 interactive_url() {
-  local value
+  local value cleaned
   value="$(prompt_value '请输入 B 站视频链接（输入 q 退出）：')" || return 1
   case "$value:l" in
     q|quit|exit) return 1 ;;
@@ -59,7 +59,14 @@ interactive_url() {
     log "链接不能为空。"
     return 2
   fi
-  print -r -- "$value"
+
+  cleaned="${value%%\?*}"
+  cleaned="${cleaned%%\#*}"
+  cleaned="${cleaned%/}"
+  if [[ "$cleaned" != "$value" ]]; then
+    print -r -- "已自动清洗链接：$cleaned" >&2
+  fi
+  print -r -- "$cleaned"
 }
 
 interactive_download() {

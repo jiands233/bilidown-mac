@@ -173,6 +173,8 @@ bilidown
 
 菜单中可以选择快速下载、查看视频信息或环境检查。也可以继续使用参数模式：
 
+交互模式会自动清洗粘贴的 B 站长链接，去掉 `?spm_id...`、`vd_source...` 等追踪参数，只保留视频地址本身。
+
 ```bash
 ./mac-bilidown/bin/bilidown doctor
 ./mac-bilidown/bin/bilidown download "https://www.bilibili.com/video/BV..."
