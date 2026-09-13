@@ -251,3 +251,7 @@ pre {
     width: 100%;
   }
 }
+
+[hidden] { display: none !important; }
+
+small { color: var(--muted); line-height: 1.5; }

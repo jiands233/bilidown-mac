@@ -37,14 +37,14 @@
             <label class="field">
               <span>保存到</span>
               <div class="path-picker">
-                <input id="output" name="output" type="text" value="~/Downloads/Bilidown">
+                <input id="output" name="output" type="text" placeholder="正在读取默认保存位置…">
                 <button id="choose-folder-button" type="button">选择文件夹</button>
               </div>
             </label>
           </div>
 
           <div class="options">
-            <label>
+            <label id="legacy-cookie-option">
               <input id="cookies" name="cookies" type="checkbox" checked>
               使用 Chrome Cookie
             </label>
@@ -54,8 +54,25 @@
             </label>
           </div>
 
+          <label id="windows-cookie-option" class="field" hidden>
+            <span>登录 Cookie</span>
+            <select id="cookie-mode" name="cookieMode">
+              <option value="none">不使用 Cookie</option>
+              <option value="chrome">从 Chrome 自动读取</option>
+              <option value="file">使用本机 cookies.txt 文件</option>
+            </select>
+          </label>
+          <label id="cookie-file-field" class="field" hidden>
+            <span>Cookie 文件</span>
+            <div class="path-picker">
+              <input id="cookie-file" name="cookieFile" type="text" placeholder="选择或输入 cookies.txt 完整路径" autocomplete="off">
+              <button id="choose-cookie-button" type="button">选择文件</button>
+            </div>
+            <small>使用 Netscape 格式的本机文件；文件内容不会上传。Chrome 读取失败时可改用此方式。</small>
+          </label>
+
           <div class="actions">
-            <button id="download-button" type="submit">下载视频</button>
+            <button id="download-button" type="submit" disabled>下载视频</button>
             <button id="doctor-button" type="button">检查环境</button>
           </div>
         </form>
@@ -63,7 +80,7 @@
         <section class="result">
           <div class="result-title">
             <strong>状态</strong>
-            <span id="status">准备就绪</span>
+            <span id="status">正在初始化…</span>
           </div>
           <pre id="log">日志会显示在这里。</pre>
         </section>

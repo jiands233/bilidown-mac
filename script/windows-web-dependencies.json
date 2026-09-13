@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "platform": "win32-x64",
+  "dependencies": [
+    {
+      "name": "node",
+      "version": "24.21.0",
+      "filename": "node-v24.21.0-win-x64.zip",
+      "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-win-x64.zip",
+      "sha256": "158f7685b44de51f6c0df1d153526cbcd3e1bc739a8dfc607721cef75de9e541",
+      "checksum_source": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt",
+      "source": "https://nodejs.org/dist/v24.21.0/node-v24.21.0.tar.xz"
+    },
+    {
+      "name": "yt-dlp",
+      "version": "2026.08.19",
+      "filename": "yt-dlp-2026.08.19.exe",
+      "url": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.08.19/yt-dlp.exe",
+      "sha256": "66674953fe251b89f4d08c5f0e35e0728679bd67ab3d7d05c0562af101dd3e7a",
+      "checksum_source": "https://api.github.com/repos/yt-dlp/yt-dlp/releases/tags/2026.08.19",
+      "source": "https://github.com/yt-dlp/yt-dlp/tree/2026.08.19"
+    },
+    {
+      "name": "ffmpeg",
+      "version": "9.0.1",
+      "filename": "ffmpeg-9.0.1-essentials_build.zip",
+      "url": "https://github.com/GyanD/codexffmpeg/releases/download/9.0.1/ffmpeg-9.0.1-essentials_build.zip",
+      "sha256": "fec81ae03971d9dd4be3ebe02e263bd2ec1d789483f931bdba5f5715e65da2e9",
+      "checksum_source": "https://api.github.com/repos/GyanD/codexffmpeg/releases/tags/9.0.1",
+      "source": "https://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz",
+      "build_information": "https://www.gyan.dev/ffmpeg/builds/",
+      "source_commit": "https://github.com/FFmpeg/FFmpeg/commit/bf1b838f2a"
+    },
+    {
+      "name": "yt-dlp-LICENSE",
+      "version": "2026.08.19",
+      "filename": "yt-dlp-2026.08.19-LICENSE",
+      "url": "https://raw.githubusercontent.com/yt-dlp/yt-dlp/2026.08.19/LICENSE",
+      "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+    },
+    {
+      "name": "yt-dlp-THIRD_PARTY_LICENSES.txt",
+      "version": "2026.08.19",
+      "filename": "yt-dlp-2026.08.19-THIRD_PARTY_LICENSES.txt",
+      "url": "https://raw.githubusercontent.com/yt-dlp/yt-dlp/2026.08.19/THIRD_PARTY_LICENSES.txt",
+      "sha256": "472aefe951c7db35e1657c1d13fd337140511ed6f2b329205105ad441c5a02b7"
+    }
+  ]
+}
